@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_DESTINATIONS 100
+#define MAX_ITINERARY 10
+#define NAME_LENGTH 50
+
+typedef struct {
+    char name[NAME_LENGTH];
+    char country[NAME_LENGTH];
+    int days;
+} Destination;
+
+typedef struct {
+    Destination destinations[MAX_ITINERARY];
+    int count;
+} Itinerary;
+Destination destinations[MAX_DESTINATIONS];
+int destinationCount = 0;
+
+void addDestination() {
+    if (destinationCount >= MAX_DESTINATIONS) {
+        printf("Cannot add more destinations.\n");
+        return;
+    }
+    
+    Destination newDestination;
+    printf("Enter destination name: ");
+    scanf("%s", newDestination.name);
+    printf("Enter country: ");
+    scanf("%s", newDestination.country);
+    printf("Enter number of days: ");
+    scanf("%d", &newDestination.days);
+    
+    destinations[destinationCount++] = newDestination;
+    printf("Destination added successfully!\n");
+}
+
+void viewDestinations() {
+    if (destinationCount == 0) {
+        printf("No destinations available.\n");
+        return;
+    }
+    
+    for (int i = 0; i < destinationCount; i++) {
+        printf("Destination %d:\n", i + 1);
+        printf("Name: %s\n", destinations[i].name);
+        printf("Country: %s\n", destinations[i].country);
+        printf("Days: %d\n\n", destinations[i].days);
+    }
+}
+void menu() {
+    int choice;
+    do {
+        printf("Travel Planner Menu:\n");
+        printf("1. Add Destination\n");
+        printf("2. View Destinations\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addDestination();
+                break;
+            case 2:
+                viewDestinations();
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    } while (choice != 3);
+}
+int main() {
+    menu();
+    return 0;
+}
+void searchDestination() {
+    char searchName[NAME_LENGTH];
+    printf("Enter the name of the destination to search: ");
+    scanf("%s", searchName);
+    
+    for (int i = 0; i < destinationCount; i++) {
+        if (strcmp(destinations[i].name, searchName) == 0) {
+            printf("Destination found:\n");
+            printf("Name: %s\n", destinations[i].name);
+            printf("Country: %s\n", destinations[i].country);
+            printf("Days: %d\n", destinations[i].days);
+            return;
+        }
+    }
+    printf("Destination not found.\n");
+}
+void saveDestinations() {
+    FILE *file = fopen("destinations.txt", "w");
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return;
+    }
+    
+    for (int i = 0; i < destinationCount; i++) {
+        fprintf(file, "%s %s %d\n", destinations[i].name, destinations[i].country, destinations[i].days);
+    }
+    fclose(file);
+    printf("Destinations saved successfully.\n");
+}
+
+void loadDestinations() {
+    FILE *file = fopen("destinations.txt", "r");
+    if (file == NULL) {
+        printf("Error opening file for reading.\n");
+        return;
+    }
+    
+    destinationCount = 0;
+    while (fscanf(file, "%s %s %d", destinations[destinationCount].name, destinations[destinationCount].country, &destinations[destinationCount].days) != EOF) {
+        destinationCount++;
+    }
+    fclose(file);
+    printf("Destinations loaded successfully.\n");
+}
